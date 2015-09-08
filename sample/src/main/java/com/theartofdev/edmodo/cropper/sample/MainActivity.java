@@ -7,13 +7,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -57,6 +57,9 @@ public class MainActivity extends Activity {
         super.onSaveInstanceState(bundle);
         bundle.putInt(ASPECT_RATIO_X, mAspectRatioX);
         bundle.putInt(ASPECT_RATIO_Y, mAspectRatioY);
+
+        bundle.putParcelable("rect",
+                ((CropImageView)findViewById(R.id.CropImageView)).getCropRect());
     }
 
     // Restores the state upon rotating the screen/restarting the activity
@@ -65,6 +68,15 @@ public class MainActivity extends Activity {
         super.onRestoreInstanceState(bundle);
         mAspectRatioX = bundle.getInt(ASPECT_RATIO_X);
         mAspectRatioY = bundle.getInt(ASPECT_RATIO_Y);
+
+        final RectF rect = bundle.getParcelable("rect");
+
+        findViewById(R.id.CropImageView).post(new Runnable() {
+            @Override
+            public void run() {
+                ((CropImageView)findViewById(R.id.CropImageView)).setCropRect(rect);
+            }
+        });
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -160,15 +172,15 @@ public class MainActivity extends Activity {
         });
 
         // Sets up the Spinner
-        showGuidelinesSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                cropImageView.setGuidelines(i);
-            }
-
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                return;
-            }
-        });
+//        showGuidelinesSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                cropImageView.setGuidelines(i);
+//            }
+//
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//                return;
+//            }
+//        });
 
         findViewById(R.id.Button_crop).setOnClickListener(new View.OnClickListener() {
 

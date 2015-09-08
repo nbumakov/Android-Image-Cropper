@@ -62,6 +62,8 @@ public class CropOverlayView extends View {
 
     private static final int GUIDELINES_ON = 2;
 
+    public static final int DEFAULT_CORNER_CIRCLE_RADIUS_DP = 6;
+
     private static RectF mRectF = new RectF();
 
     /**
@@ -130,6 +132,8 @@ public class CropOverlayView extends View {
      */
     private CropImageView.CropShape mCropShape;
 
+    private CropImageView.CornersShape mCornersShape = CropImageView.CornersShape.LINE;
+
     // Whether the Crop View has been initialized for the first time
     private boolean initializedCropWindow = false;
 
@@ -139,6 +143,10 @@ public class CropOverlayView extends View {
     private float mCornerOffset;
 
     private float mCornerLength;
+
+    private int mMainColor;
+
+    private float mCornerCircleRadius;
     //endregion
 
     public CropOverlayView(Context context) {
@@ -181,12 +189,23 @@ public class CropOverlayView extends View {
         invalidate();
     }
 
+    public void setCornersShape(CropImageView.CornersShape cornersShape) {
+        mCornersShape = cornersShape;
+        invalidate();
+    }
+
+    public void setColor(int color) {
+        mMainColor = color;
+        initPaints(getContext());
+        invalidate();
+    }
+
     /**
      * Sets the guidelines for the CropOverlayView to be either on, off, or to
      * show when resizing the application.
      *
      * @param guidelines Integer that signals whether the guidelines should be
-     * on, off, or only showing when resizing.
+     *                   on, off, or only showing when resizing.
      */
     public void setGuidelines(int guidelines) {
         if (guidelines < 0 || guidelines > 2)
@@ -206,7 +225,7 @@ public class CropOverlayView extends View {
      * ratio, while false allows it to be changed.
      *
      * @param fixAspectRatio Boolean that signals whether the aspect ratio
-     * should be maintained.
+     *                       should be maintained.
      */
     public void setFixedAspectRatio(boolean fixAspectRatio) {
         mFixAspectRatio = fixAspectRatio;
@@ -221,7 +240,7 @@ public class CropOverlayView extends View {
      * Sets the X value of the aspect ratio; is defaulted to 1.
      *
      * @param aspectRatioX int that specifies the new X value of the aspect
-     * ratio
+     *                     ratio
      */
     public void setAspectRatioX(int aspectRatioX) {
         if (aspectRatioX <= 0)
@@ -241,7 +260,7 @@ public class CropOverlayView extends View {
      * Sets the Y value of the aspect ratio; is defaulted to 1.
      *
      * @param aspectRatioY int that specifies the new Y value of the aspect
-     * ratio
+     *                     ratio
      */
     public void setAspectRatioY(int aspectRatioY) {
         if (aspectRatioY <= 0)
@@ -261,14 +280,14 @@ public class CropOverlayView extends View {
      * Sets all initial values, but does not call initCropWindow to reset the
      * views. Used once at the very start to initialize the attributes.
      *
-     * @param guidelines Integer that signals whether the guidelines should be
-     * on, off, or only showing when resizing.
+     * @param guidelines     Integer that signals whether the guidelines should be
+     *                       on, off, or only showing when resizing.
      * @param fixAspectRatio Boolean that signals whether the aspect ratio
-     * should be maintained.
-     * @param aspectRatioX float that specifies the new X value of the aspect
-     * ratio
-     * @param aspectRatioY float that specifies the new Y value of the aspect
-     * ratio
+     *                       should be maintained.
+     * @param aspectRatioX   float that specifies the new X value of the aspect
+     *                       ratio
+     * @param aspectRatioY   float that specifies the new Y value of the aspect
+     *                       ratio
      */
     public void setInitialAttributeValues(int guidelines, boolean fixAspectRatio, int aspectRatioX, int aspectRatioY) {
         if (guidelines < 0 || guidelines > 2)
@@ -322,7 +341,10 @@ public class CropOverlayView extends View {
             }
         }
 
-        float w = mBorderPaint.getStrokeWidth();
+
+        float w = mCornersShape == CropImageView.CornersShape.LINE
+                ? mBorderPaint.getStrokeWidth()
+                : 0;
         float l = Edge.LEFT.getCoordinate() + w;
         float t = Edge.TOP.getCoordinate() + w;
         float r = Edge.RIGHT.getCoordinate() - w;
@@ -378,10 +400,7 @@ public class CropOverlayView extends View {
                 SNAP_RADIUS_DP,
                 displayMetrics);
 
-        mBorderPaint = PaintUtil.newBorderPaint(context);
-        mGuidelinePaint = PaintUtil.newGuidelinePaint();
-        mBackgroundPaint = PaintUtil.newBackgroundPaint(context);
-        mCornerPaint = PaintUtil.newCornerPaint(context);
+        initPaints(context);
 
         // Sets the values for the corner sizes
         mCornerOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -396,6 +415,19 @@ public class CropOverlayView extends View {
 
         // Sets guidelines to default until specified otherwise
         mGuidelines = CropImageView.DEFAULT_GUIDELINES;
+
+        mCornerCircleRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                DEFAULT_CORNER_CIRCLE_RADIUS_DP,
+                context.getResources().getDisplayMetrics());
+    }
+
+    private void initPaints(Context context) {
+        mBorderPaint = PaintUtil.newBorderPaint(context, mMainColor);
+        mGuidelinePaint = PaintUtil.newGuidelinePaint(mMainColor);
+        mBackgroundPaint = PaintUtil.newBackgroundPaint(context);
+        mCornerPaint = mCornersShape == CropImageView.CornersShape.LINE
+                ? PaintUtil.newCornerPaint(context, mMainColor)
+                : PaintUtil.newCircleCornerPaint(mMainColor);
     }
 
     private RectF mSavedRect;
@@ -431,7 +463,7 @@ public class CropOverlayView extends View {
             initializedCropWindow = true;
         }
 
-        if(mSavedRect != null){
+        if (mSavedRect != null) {
             Edge.LEFT.setCoordinate(mSavedRect.left);
             Edge.TOP.setCoordinate(mSavedRect.top);
             Edge.RIGHT.setCoordinate(mSavedRect.right);
@@ -581,27 +613,39 @@ public class CropOverlayView extends View {
 
     private void drawCorners(Canvas canvas) {
 
-        float w = mBorderPaint.getStrokeWidth();
+
+        float w = mCornersShape == CropImageView.CornersShape.LINE
+                ? mBorderPaint.getStrokeWidth()
+                : 0;
         final float l = Edge.LEFT.getCoordinate() + w;
         final float t = Edge.TOP.getCoordinate() + w;
         final float r = Edge.RIGHT.getCoordinate() - w;
         final float b = Edge.BOTTOM.getCoordinate() - w;
 
-        // Top left
-        canvas.drawLine(l - mCornerOffset, t - mCornerExtension, l - mCornerOffset, t + mCornerLength, mCornerPaint);
-        canvas.drawLine(l, t - mCornerOffset, l + mCornerLength, t - mCornerOffset, mCornerPaint);
+        if (mCornersShape == CropImageView.CornersShape.LINE) {
 
-        // Top right
-        canvas.drawLine(r + mCornerOffset, t - mCornerExtension, r + mCornerOffset, t + mCornerLength, mCornerPaint);
-        canvas.drawLine(r, t - mCornerOffset, r - mCornerLength, t - mCornerOffset, mCornerPaint);
+            // Top left
+            canvas.drawLine(l - mCornerOffset, t - mCornerExtension, l - mCornerOffset, t + mCornerLength, mCornerPaint);
+            canvas.drawLine(l, t - mCornerOffset, l + mCornerLength, t - mCornerOffset, mCornerPaint);
 
-        // Bottom left
-        canvas.drawLine(l - mCornerOffset, b + mCornerExtension, l - mCornerOffset, b - mCornerLength, mCornerPaint);
-        canvas.drawLine(l, b + mCornerOffset, l + mCornerLength, b + mCornerOffset, mCornerPaint);
+            // Top right
+            canvas.drawLine(r + mCornerOffset, t - mCornerExtension, r + mCornerOffset, t + mCornerLength, mCornerPaint);
+            canvas.drawLine(r, t - mCornerOffset, r - mCornerLength, t - mCornerOffset, mCornerPaint);
 
-        // Bottom left
-        canvas.drawLine(r + mCornerOffset, b + mCornerExtension, r + mCornerOffset, b - mCornerLength, mCornerPaint);
-        canvas.drawLine(r, b + mCornerOffset, r - mCornerLength, b + mCornerOffset, mCornerPaint);
+            // Bottom left
+            canvas.drawLine(l - mCornerOffset, b + mCornerExtension, l - mCornerOffset, b - mCornerLength, mCornerPaint);
+            canvas.drawLine(l, b + mCornerOffset, l + mCornerLength, b + mCornerOffset, mCornerPaint);
+
+            // Bottom left
+            canvas.drawLine(r + mCornerOffset, b + mCornerExtension, r + mCornerOffset, b - mCornerLength, mCornerPaint);
+            canvas.drawLine(r, b + mCornerOffset, r - mCornerLength, b + mCornerOffset, mCornerPaint);
+
+        } else {
+            canvas.drawCircle(l, t, mCornerCircleRadius, mCornerPaint);
+            canvas.drawCircle(r, t, mCornerCircleRadius, mCornerPaint);
+            canvas.drawCircle(l, b, mCornerCircleRadius, mCornerPaint);
+            canvas.drawCircle(r, b, mCornerCircleRadius, mCornerPaint);
+        }
     }
 
     /**

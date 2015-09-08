@@ -18,6 +18,11 @@
             <enum name="rectangle" value="0"/>
             <enum name="oval" value="1"/>
         </attr>
+        <attr name="cornersShape">
+            <enum name="line" value="0"/>
+            <enum name="circle" value="1"/>
+        </attr>
+        <attr name="color" format="color"/>
     </declare-styleable>
 
 </resources>

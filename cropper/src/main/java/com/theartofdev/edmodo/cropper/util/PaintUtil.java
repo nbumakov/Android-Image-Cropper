@@ -29,7 +29,7 @@ public final class PaintUtil {
 
     private static final String SEMI_TRANSPARENT = "#AAFFFFFF";
 
-    private static final String DEFAULT_BACKGROUND_COLOR_ID = "#77000000";
+    private static final String DEFAULT_BACKGROUND_COLOR_ID = "#77FFFFFF";
 
     private static final float DEFAULT_LINE_THICKNESS_DP = 2;
 
@@ -44,7 +44,7 @@ public final class PaintUtil {
      * @param context the Context
      * @return new Paint object
      */
-    public static Paint newBorderPaint(Context context) {
+    public static Paint newBorderPaint(Context context, int color) {
 
         // Set the line thickness for the crop window border.
         final float lineThicknessPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -52,7 +52,7 @@ public final class PaintUtil {
                 context.getResources().getDisplayMetrics());
 
         final Paint borderPaint = new Paint();
-        borderPaint.setColor(Color.parseColor(SEMI_TRANSPARENT));
+        borderPaint.setColor(getSemiTransparentColor(color));
         borderPaint.setStrokeWidth(lineThicknessPx);
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setAntiAlias(true);
@@ -65,10 +65,10 @@ public final class PaintUtil {
      *
      * @return the new Paint object
      */
-    public static Paint newGuidelinePaint() {
+    public static Paint newGuidelinePaint(int color) {
 
         final Paint paint = new Paint();
-        paint.setColor(Color.parseColor(SEMI_TRANSPARENT));
+        paint.setColor(getSemiTransparentColor(color));
         paint.setStrokeWidth(DEFAULT_GUIDELINE_THICKNESS_PX);
 
         return paint;
@@ -95,7 +95,7 @@ public final class PaintUtil {
      * @param context the Context
      * @return the new Paint object
      */
-    public static Paint newCornerPaint(Context context) {
+    public static Paint newCornerPaint(Context context, int color) {
 
         // Set the line thickness for the crop window border.
         final float lineThicknessPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -103,9 +103,18 @@ public final class PaintUtil {
                 context.getResources().getDisplayMetrics());
 
         final Paint cornerPaint = new Paint();
-        cornerPaint.setColor(DEFAULT_CORNER_COLOR);
+        cornerPaint.setColor(color);
         cornerPaint.setStrokeWidth(lineThicknessPx);
         cornerPaint.setStyle(Paint.Style.STROKE);
+
+        return cornerPaint;
+    }
+
+    public static Paint newCircleCornerPaint(int color) {
+        final Paint cornerPaint = new Paint();
+        cornerPaint.setColor(color);
+        cornerPaint.setStyle(Paint.Style.FILL);
+        cornerPaint.setAntiAlias(true);
 
         return cornerPaint;
     }
@@ -126,6 +135,10 @@ public final class PaintUtil {
      */
     public static float getLineThickness() {
         return DEFAULT_LINE_THICKNESS_DP;
+    }
+
+    private static int getSemiTransparentColor(int color){
+        return Color.argb(170, Color.red(color), Color.green(color), Color.blue(color));
     }
 
 }

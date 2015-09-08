@@ -18,6 +18,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -63,11 +64,17 @@ public class CropImageView extends FrameLayout {
 
     public static final int DEFAULT_CROP_SHAPE_INDEX = 0;
 
+    public static final int DEFAULT_CORNERS_SHAPE_INDEX = 0;
+
     private static final int DEFAULT_IMAGE_RESOURCE = 0;
+
+    private static final int DEFAULT_COLOR = Color.RED;
 
     private static final ImageView.ScaleType[] VALID_SCALE_TYPES = new ImageView.ScaleType[]{ImageView.ScaleType.CENTER_INSIDE, ImageView.ScaleType.FIT_CENTER};
 
     private static final CropShape[] VALID_CROP_SHAPES = new CropShape[]{CropShape.RECTANGLE, CropShape.OVAL};
+
+    private static final CornersShape[] VALID_CORNERS_SHAPES = new CornersShape[]{CornersShape.LINE, CornersShape.CIRCLE};
 
     private static final String DEGREES_ROTATED = "DEGREES_ROTATED";
 
@@ -82,6 +89,8 @@ public class CropImageView extends FrameLayout {
     private int mLayoutWidth;
 
     private int mLayoutHeight;
+
+    private int mMainColor;
 
     /**
      * Instance variables for customizable attributes
@@ -102,6 +111,11 @@ public class CropImageView extends FrameLayout {
      * The shape of the cropping area - rectangle/circular.
      */
     private CropImageView.CropShape mCropShape;
+
+    /**
+     * The shape of the corners - lines/circles.
+     */
+    private CropImageView.CornersShape mCornersShape;
 
     /**
      * The URI that the image was loaded from (if loaded from URI)
@@ -129,8 +143,10 @@ public class CropImageView extends FrameLayout {
             mAspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, DEFAULT_ASPECT_RATIO_X);
             mAspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, DEFAULT_ASPECT_RATIO_Y);
             mImageResource = ta.getResourceId(R.styleable.CropImageView_imageResource, DEFAULT_IMAGE_RESOURCE);
+            mMainColor = ta.getColor(R.styleable.CropImageView_color, DEFAULT_COLOR);
             mScaleType = VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, DEFAULT_SCALE_TYPE_INDEX)];
             mCropShape = VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, DEFAULT_CROP_SHAPE_INDEX)];
+            mCornersShape = VALID_CORNERS_SHAPES[ta.getInt(R.styleable.CropImageView_cornersShape, DEFAULT_CORNERS_SHAPE_INDEX)];
         } finally {
             ta.recycle();
         }
@@ -168,6 +184,16 @@ public class CropImageView extends FrameLayout {
         if (cropShape != mCropShape) {
             mCropShape = cropShape;
             mCropOverlayView.setCropShape(cropShape);
+        }
+    }
+
+    /**
+     * The shape of the corners - lines/circles.
+     */
+    public void setCornersShape(CropImageView.CornersShape cornersShape) {
+        if (cornersShape != mCornersShape) {
+            mCornersShape = cornersShape;
+            mCropOverlayView.setCornersShape(cornersShape);
         }
     }
 
@@ -618,6 +644,8 @@ public class CropImageView extends FrameLayout {
         mCropOverlayView = (CropOverlayView) v.findViewById(R.id.CropOverlayView);
         mCropOverlayView.setInitialAttributeValues(mGuidelines, mFixAspectRatio, mAspectRatioX, mAspectRatioY);
         mCropOverlayView.setCropShape(mCropShape);
+        mCropOverlayView.setCornersShape(mCornersShape);
+        mCropOverlayView.setColor(mMainColor);
     }
 
     /**
@@ -653,9 +681,14 @@ public class CropImageView extends FrameLayout {
     /**
      * The possible cropping area shape
      */
-    public static enum CropShape {
+    public enum CropShape {
         RECTANGLE,
         OVAL
+    }
+
+    public enum CornersShape {
+        LINE,
+        CIRCLE
     }
     //endregion
 }
