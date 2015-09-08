@@ -398,6 +398,21 @@ public class CropOverlayView extends View {
         mGuidelines = CropImageView.DEFAULT_GUIDELINES;
     }
 
+    private RectF mSavedRect;
+
+    public void setCropRect(RectF rect) {
+        mSavedRect = rect;
+    }
+
+    public RectF getCropRect() {
+        return new RectF(
+                Edge.LEFT.getCoordinate(),
+                Edge.TOP.getCoordinate(),
+                Edge.RIGHT.getCoordinate(),
+                Edge.BOTTOM.getCoordinate()
+        );
+    }
+
     /**
      * Set the initial crop window size and position. This is dependent on the
      * size and position of the image being cropped.
@@ -414,6 +429,14 @@ public class CropOverlayView extends View {
         // initialized
         if (!initializedCropWindow) {
             initializedCropWindow = true;
+        }
+
+        if(mSavedRect != null){
+            Edge.LEFT.setCoordinate(mSavedRect.left);
+            Edge.TOP.setCoordinate(mSavedRect.top);
+            Edge.RIGHT.setCoordinate(mSavedRect.right);
+            Edge.BOTTOM.setCoordinate(mSavedRect.bottom);
+            return;
         }
 
         if (mFixAspectRatio

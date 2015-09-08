@@ -462,6 +462,14 @@ public class CropImageView extends FrameLayout {
         }
     }
 
+    public RectF getCropRect(){
+        return mCropOverlayView.getCropRect();
+    }
+
+    public void setCropRect(RectF rect){
+        mCropOverlayView.setCropRect(rect);
+    }
+
     //region: Private methods
 
     @Override
