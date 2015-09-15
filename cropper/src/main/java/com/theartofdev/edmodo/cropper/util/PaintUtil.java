@@ -29,7 +29,7 @@ public final class PaintUtil {
 
     private static final String SEMI_TRANSPARENT = "#AAFFFFFF";
 
-    private static final String DEFAULT_BACKGROUND_COLOR_ID = "#77FFFFFF";
+    private static final String DEFAULT_BACKGROUND_COLOR_ID = "#77000000";
 
     private static final float DEFAULT_LINE_THICKNESS_DP = 2;
 
@@ -79,12 +79,13 @@ public final class PaintUtil {
      * crop window.
      *
      * @param context the Context
+     * @param color the color of background
      * @return the new Paint object
      */
-    public static Paint newBackgroundPaint(Context context) {
+    public static Paint newBackgroundPaint(Context context, int color) {
 
         final Paint paint = new Paint();
-        paint.setColor(Color.parseColor(DEFAULT_BACKGROUND_COLOR_ID));
+        paint.setColor(color != 0 ? color : Color.parseColor(DEFAULT_BACKGROUND_COLOR_ID));
 
         return paint;
     }
