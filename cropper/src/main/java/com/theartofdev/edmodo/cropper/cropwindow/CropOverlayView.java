@@ -146,6 +146,8 @@ public class CropOverlayView extends View {
 
     private int mMainColor;
 
+    private int mBackgroundColor;
+
     private float mCornerCircleRadius;
     //endregion
 
@@ -196,6 +198,12 @@ public class CropOverlayView extends View {
 
     public void setColor(int color) {
         mMainColor = color;
+        initPaints(getContext());
+        invalidate();
+    }
+
+    public void setBackgroundColor(int color) {
+        mBackgroundColor = color;
         initPaints(getContext());
         invalidate();
     }
@@ -424,7 +432,7 @@ public class CropOverlayView extends View {
     private void initPaints(Context context) {
         mBorderPaint = PaintUtil.newBorderPaint(context, mMainColor);
         mGuidelinePaint = PaintUtil.newGuidelinePaint(mMainColor);
-        mBackgroundPaint = PaintUtil.newBackgroundPaint(context);
+        mBackgroundPaint = PaintUtil.newBackgroundPaint(context, mBackgroundColor);
         mCornerPaint = mCornersShape == CropImageView.CornersShape.LINE
                 ? PaintUtil.newCornerPaint(context, mMainColor)
                 : PaintUtil.newCircleCornerPaint(mMainColor);
@@ -640,7 +648,7 @@ public class CropOverlayView extends View {
             canvas.drawLine(r + mCornerOffset, b + mCornerExtension, r + mCornerOffset, b - mCornerLength, mCornerPaint);
             canvas.drawLine(r, b + mCornerOffset, r - mCornerLength, b + mCornerOffset, mCornerPaint);
 
-        } else {
+        } else if (mCornersShape == CropImageView.CornersShape.CIRCLE) {
             canvas.drawCircle(l, t, mCornerCircleRadius, mCornerPaint);
             canvas.drawCircle(r, t, mCornerCircleRadius, mCornerPaint);
             canvas.drawCircle(l, b, mCornerCircleRadius, mCornerPaint);

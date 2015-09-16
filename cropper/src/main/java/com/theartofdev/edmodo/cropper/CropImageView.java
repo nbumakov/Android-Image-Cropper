@@ -70,11 +70,13 @@ public class CropImageView extends FrameLayout {
 
     private static final int DEFAULT_COLOR = Color.RED;
 
+    private static final int DEFAULT_BACKGROUND_COLOR = Color.parseColor("#77000000");
+
     private static final ImageView.ScaleType[] VALID_SCALE_TYPES = new ImageView.ScaleType[]{ImageView.ScaleType.CENTER_INSIDE, ImageView.ScaleType.FIT_CENTER};
 
     private static final CropShape[] VALID_CROP_SHAPES = new CropShape[]{CropShape.RECTANGLE, CropShape.OVAL};
 
-    private static final CornersShape[] VALID_CORNERS_SHAPES = new CornersShape[]{CornersShape.LINE, CornersShape.CIRCLE};
+    private static final CornersShape[] VALID_CORNERS_SHAPES = new CornersShape[]{CornersShape.LINE, CornersShape.CIRCLE, CornersShape.NONE};
 
     private static final String DEGREES_ROTATED = "DEGREES_ROTATED";
 
@@ -91,6 +93,8 @@ public class CropImageView extends FrameLayout {
     private int mLayoutHeight;
 
     private int mMainColor;
+
+    private int mBackgroundColor;
 
     /**
      * Instance variables for customizable attributes
@@ -143,6 +147,7 @@ public class CropImageView extends FrameLayout {
             mAspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, DEFAULT_ASPECT_RATIO_X);
             mAspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, DEFAULT_ASPECT_RATIO_Y);
             mImageResource = ta.getResourceId(R.styleable.CropImageView_imageResource, DEFAULT_IMAGE_RESOURCE);
+            mBackgroundColor = ta.getColor(R.styleable.CropImageView_backgroundColor, DEFAULT_BACKGROUND_COLOR);
             mMainColor = ta.getColor(R.styleable.CropImageView_borderLinesColor, DEFAULT_COLOR);
             mScaleType = VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, DEFAULT_SCALE_TYPE_INDEX)];
             mCropShape = VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, DEFAULT_CROP_SHAPE_INDEX)];
@@ -646,6 +651,7 @@ public class CropImageView extends FrameLayout {
         mCropOverlayView.setCropShape(mCropShape);
         mCropOverlayView.setCornersShape(mCornersShape);
         mCropOverlayView.setColor(mMainColor);
+        mCropOverlayView.setBackgroundColor(mBackgroundColor);
     }
 
     /**
@@ -688,7 +694,8 @@ public class CropImageView extends FrameLayout {
 
     public enum CornersShape {
         LINE,
-        CIRCLE
+        CIRCLE,
+        NONE
     }
     //endregion
 }
