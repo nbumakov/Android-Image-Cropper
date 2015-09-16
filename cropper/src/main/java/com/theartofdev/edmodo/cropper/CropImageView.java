@@ -143,7 +143,7 @@ public class CropImageView extends FrameLayout {
             mAspectRatioX = ta.getInteger(R.styleable.CropImageView_aspectRatioX, DEFAULT_ASPECT_RATIO_X);
             mAspectRatioY = ta.getInteger(R.styleable.CropImageView_aspectRatioY, DEFAULT_ASPECT_RATIO_Y);
             mImageResource = ta.getResourceId(R.styleable.CropImageView_imageResource, DEFAULT_IMAGE_RESOURCE);
-            mMainColor = ta.getColor(R.styleable.CropImageView_color, DEFAULT_COLOR);
+            mMainColor = ta.getColor(R.styleable.CropImageView_borderLinesColor, DEFAULT_COLOR);
             mScaleType = VALID_SCALE_TYPES[ta.getInt(R.styleable.CropImageView_scaleType, DEFAULT_SCALE_TYPE_INDEX)];
             mCropShape = VALID_CROP_SHAPES[ta.getInt(R.styleable.CropImageView_cropShape, DEFAULT_CROP_SHAPE_INDEX)];
             mCornersShape = VALID_CORNERS_SHAPES[ta.getInt(R.styleable.CropImageView_cornersShape, DEFAULT_CORNERS_SHAPE_INDEX)];

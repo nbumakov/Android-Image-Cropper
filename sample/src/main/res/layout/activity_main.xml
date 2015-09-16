@@ -23,7 +23,7 @@
             android:layout_gravity="center"
             custom:imageResource="@drawable/butterfly"
             custom:cornersShape="circle"
-            custom:color="#FFA000"/>
+            custom:borderLinesColor="#FFA000"/>
 
         <LinearLayout
             android:layout_width="match_parent"
